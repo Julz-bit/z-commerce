@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator drizzle {
+  provider = "drizzle-prisma-generator"
+  output   = "../src/common/drizzle/schema.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id            String         @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  email         String         @unique
+  password      String
+  name          String
+  phone         String
+  addresses     Json?
+  lastAccess    DateTime?
+  isVerified    Boolean?       @default(false)
+  avatar        String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime?      @updatedAt
+  cartItems     cartItem[]
+  orders        order[]
+  reviews       review[]
+  stores        store[]
+  voucherUsages voucherUsage[]
+
+  @@index([cursor])
+  @@index([email])
+}
+
+model store {
+  id            String     @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  ownerId       String
+  name          String
+  description   String?
+  rating        Decimal?   @db.Decimal(3, 2)
+  isVerified    Boolean?   @default(false)
+  contactNumber String?
+  logo          String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime?  @updatedAt
+  cartItems     cartItem[]
+  discounts     discount[]
+  orders        order[]
+  products      product[]
+  owner         user       @relation(fields: [ownerId], references: [id])
+  vouchers      voucher[]
+
+  @@index([cursor])
+  @@index([ownerId])
+  @@index([name])
+  
+}
+
+model category {
+  id        String     @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  name      String     @unique
+  parentId  String?
+  createdAt DateTime   @default(now())
+  parent    category?  @relation("categoryToParent", fields: [parentId], references: [id])
+  children  category[] @relation("categoryToParent")
+
+  @@index([cursor])
+  @@index([parentId])
+  @@index([name(ops: raw("gin_trgm_ops"))], map: "category_name_trgm_idx", type: Gin)
+}
+
+model product {
+  id               String            @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  storeId          String
+  name             String
+  description      String?
+  price            Decimal           @db.Decimal(10, 2)
+  stock            Int               @default(0)
+  categories       Json?
+  attributes       Json?
+  files            Json?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime?         @updatedAt
+  cartItems        cartItem[]
+  flashSales       flashSale[]
+  orderItems       orderItem[]
+  store            store             @relation(fields: [storeId], references: [id])
+  productDiscounts productDiscount[]
+  reviews          review[]
+
+  @@index([cursor])
+  @@index([storeId])
+  @@index([name])
+  @@index([price])
+  @@index([categories], map: "product_categories_gin_idx", type: Gin)
+}
+
+model cartItem {
+  id        String   @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  userId    String
+  productId String
+  storeId   String
+  quantity  Int      @default(1)
+  price     Decimal  @db.Decimal(10, 2)
+  status    CartItemStatus   @default(active)
+  addedAt   DateTime @default(now())
+  product   product  @relation(fields: [productId], references: [id])
+  store     store    @relation(fields: [storeId], references: [id])
+  user      user     @relation(fields: [userId], references: [id])
+
+  @@index([cursor])
+  @@index([userId])
+  @@index([storeId])
+  @@index([productId])
+  @@index([status])
+}
+
+model order {
+  id            String         @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  userId        String
+  storeId       String
+  total         Decimal        @db.Decimal(10, 2)
+  status        OrderStatus    @default(pending)
+  paymentType   PaymentType?
+  shippingInfo  Json
+  paymentInfo   Json
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime?      @updatedAt
+  store         store          @relation(fields: [storeId], references: [id])
+  user          user           @relation(fields: [userId], references: [id])
+  orderItems    orderItem[]
+  voucherUsages voucherUsage[]
+
+  @@index([cursor])
+  @@index([userId])
+  @@index([storeId])
+  @@index([status])
+}
+
+model orderItem {
+  id        String  @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  order     order   @relation(fields: [orderId], references: [id])
+  product   product @relation(fields: [productId], references: [id])
+
+  @@index([cursor])
+  @@index([orderId])
+  @@index([productId])
+}
+
+model review {
+  id        String    @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  userId    String
+  productId String
+  rating    Int
+  comment   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  product   product   @relation(fields: [productId], references: [id])
+  user      user      @relation(fields: [userId], references: [id])
+
+  @@index([cursor])
+  @@index([userId])
+  @@index([productId])
+}
+
+model discount {
+  id               String            @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  storeId          String
+  name             String?
+  type             String
+  amount           Decimal           @db.Decimal(10, 2)
+  minorderValue    Decimal?          @db.Decimal(10, 2)
+  maxdiscountValue Decimal?          @db.Decimal(10, 2)
+  startAt          DateTime?
+  endAt            DateTime?
+  createdAt        DateTime          @default(now())
+  store            store             @relation(fields: [storeId], references: [id])
+  productDiscounts productDiscount[]
+
+  @@index([cursor])
+  @@index([storeId])
+  @@index([startAt])
+  @@index([endAt])
+}
+
+model productDiscount {
+  id         String   @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  productId  String
+  discountId String
+  discount   discount @relation(fields: [discountId], references: [id])
+  product    product  @relation(fields: [productId], references: [id])
+
+  @@index([cursor])
+  @@unique([productId, discountId])
+  @@index([productId])
+  @@index([discountId])
+}
+
+model flashSale {
+  id         String   @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  productId  String
+  flashPrice Decimal  @db.Decimal(10, 2)
+  stockLimit Int?
+  startAt    DateTime
+  endAt      DateTime
+  createdAt  DateTime @default(now())
+  product    product  @relation(fields: [productId], references: [id])
+
+  @@index([cursor])
+  @@index([productId])
+  @@index([startAt])
+  @@index([endAt])
+}
+
+model voucher {
+  id               String         @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  code             String         @unique
+  storeId          String?
+  type             String
+  amount           Decimal        @db.Decimal(10, 2)
+  minorderValue    Decimal?       @db.Decimal(10, 2)
+  maxdiscountValue Decimal?       @db.Decimal(10, 2)
+  totalUsageLimit  Int?
+  peruserLimit     Int?
+  startAt          DateTime?
+  endAt            DateTime?
+  createdAt        DateTime       @default(now())
+  store            store?         @relation(fields: [storeId], references: [id])
+  usages           voucherUsage[]
+
+  @@index([cursor])
+  @@index([storeId])
+  @@index([startAt])
+  @@index([endAt])
+  @@index([type])
+}
+
+model voucherUsage {
+  id        String   @id @default(cuid())
+  cursor        Int            @default(autoincrement())
+  voucherId String
+  userId    String
+  orderId   String
+  usedAt    DateTime @default(now())
+  order     order    @relation(fields: [orderId], references: [id])
+  user      user     @relation(fields: [userId], references: [id])
+  voucher   voucher  @relation(fields: [voucherId], references: [id])
+
+  @@index([cursor])
+  @@unique([voucherId, userId, orderId])
+  @@index([voucherId])
+  @@index([userId])
+  @@index([orderId])
+}
+
+
+enum CartItemStatus {
+  active
+  wishlist
+  out_of_stock
+}
+
+enum OrderStatus {
+  pending         // order placed but not paid yet
+  for_payment     // waiting for payment
+  paid            // payment received
+  processing      // order being prepared/packed
+  on_transit      // shipped, in delivery
+  delivered       // delivered to customer
+  received        // customer confirmed receipt
+  completed       // fully completed (optional)
+  cancelled       // cancelled by customer/admin
+  failed          // payment or delivery failed
+  returned        // returned by customer
+  refunded        // refund processed
+}
+
+enum PaymentType {
+  cod         // Cash on Delivery
+  gcash       // GCash or similar e-wallet
+  card        // Credit or Debit card
+  bank        // Bank transfer
+  paypal      // PayPal
+  other       // fallback or custom payments
+}
