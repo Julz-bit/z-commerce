@@ -13,7 +13,7 @@ import { UpdateStoreDto } from './dto/update-store.dto';
 import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
 import { Auth } from '@app/modules/auth/decorators/auth.decorator';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthInterface } from '@app/common/interfaces/auth.interface';
+import { AuthUser } from '@app/common/interfaces/auth-user.interface';
 
 @ApiTags('Store Service')
 @ApiBearerAuth()
@@ -24,7 +24,7 @@ export class StoreController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new store' })
-  async create(@Body() body: CreateStoreDto, @Auth() auth: AuthInterface) {
+  async create(@Body() body: CreateStoreDto, @Auth() auth: AuthUser) {
     return await this.storeService.create(body, auth.id);
   }
 
@@ -36,7 +36,7 @@ export class StoreController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update store' })
-  update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
-    return this.storeService.update(+id, updateStoreDto);
+  async update(@Param('id') id: string, @Body() body: UpdateStoreDto) {
+    return await this.storeService.update(id, body);
   }
 }

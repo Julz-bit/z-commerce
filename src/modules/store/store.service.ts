@@ -22,9 +22,7 @@ export class StoreService {
       .values({
         id: createId(),
         ownerId,
-        name: dto.name,
-        description: dto.description,
-        contactNumber: dto.contactNumber,
+        ...dto,
       })
       .returning()
       .then((rows) => rows[0]);
@@ -46,7 +44,18 @@ export class StoreService {
     return result;
   }
 
-  update(id: number, updateStoreDto: UpdateStoreDto) {
-    return `This action updates a #${id} store`;
+  async update(id: string, dto: UpdateStoreDto): Promise<StoreModel> {
+    const data = await this.findOne(id);
+    const result = await this.drizzle.client
+      .update(store)
+      .set({
+        ...dto,
+        updatedAt: new Date(),
+      })
+      .where(eq(store.id, data.id))
+      .returning()
+      .then((rows) => rows[0]);
+    await this.cache.del(`${CacheKeys.STORE}:${id}`);
+    return result;
   }
 }

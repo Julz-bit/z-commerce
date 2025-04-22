@@ -12,13 +12,8 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { QueryCategoryDto } from './dto/query-category.dto';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
-import { SortOrder } from '@app/common/enums/sort-order.enum';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiPaginationQuery } from '@app/common/decorators/api-pagination-query.decorator';
 
 @ApiTags('Category Service')
 @ApiBearerAuth()
@@ -36,15 +31,7 @@ export class CategoryController {
   @ApiOperation({
     summary: 'Get paginated result using cursor based pagination',
   })
-  @ApiQuery({
-    name: 'order',
-    enum: SortOrder,
-    required: true,
-    example: SortOrder.ASC,
-  })
-  @ApiQuery({ name: 'limit', required: true, example: 20 })
-  @ApiQuery({ name: 'cursor', required: false })
-  @ApiQuery({ name: 'search', required: false })
+  @ApiPaginationQuery()
   async findAll(@Query() query: QueryCategoryDto) {
     return await this.categoryService.findAll(query);
   }

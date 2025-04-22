@@ -1,4 +1,4 @@
-export class AuthInterface {
+export class AuthUser {
   id: string;
   email: string;
   phone: string;
