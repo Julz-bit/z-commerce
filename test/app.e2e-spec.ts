@@ -3,6 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import Redis from 'ioredis';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
@@ -12,8 +14,12 @@ describe('AppController (e2e)', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter()
+    );
+    app.enableShutdownHooks(); 
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   it('/ (GET)', () => {
@@ -21,5 +27,12 @@ describe('AppController (e2e)', () => {
       .get('/')
       .expect(200)
       .expect('Hello World!');
+  });
+
+  afterAll(async () => {
+    const redis = app.get<Redis>('REDIS_CLIENT');
+    await redis.quit();
+    await app.close();
+    await app.getHttpAdapter().getInstance().close();
   });
 });
