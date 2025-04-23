@@ -1,9 +1,9 @@
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 
 @Injectable()
-export class CachingService {
+export class CachingService implements OnModuleDestroy {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject('REDIS_CLIENT') private redis: Redis,
@@ -39,5 +39,9 @@ export class CachingService {
         cursor = nextCursor;
       } while (cursor !== '0');
     }
+  }
+
+  onModuleDestroy() {
+    this.redis.quit();
   }
 }
