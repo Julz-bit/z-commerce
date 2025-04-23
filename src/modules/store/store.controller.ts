@@ -6,14 +6,22 @@ import {
   Patch,
   Param,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
-import { CreateStoreDto } from './dto/create-store.dto';
-import { UpdateStoreDto } from './dto/update-store.dto';
+import { CreateStoreDto } from './dtos/create-store.dto';
+import { UpdateStoreDto } from './dtos/update-store.dto';
 import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
 import { Auth } from '@app/modules/auth/decorators/auth.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthUser } from '@app/common/interfaces/auth-user.interface';
+import { StoreOwnerGuard } from './guards/store-owner.guard';
+import { FastifyRequest } from 'fastify';
 
 @ApiTags('Store Service')
 @ApiBearerAuth()
@@ -29,12 +37,20 @@ export class StoreController {
   }
 
   @Get(':id')
+  @UseGuards(StoreOwnerGuard)
   @ApiOperation({ summary: 'Get store via id' })
-  async findOne(@Param('id') id: string) {
-    return await this.storeService.findOne(id);
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'store id',
+    example: 'wbqfo03a0qx8qmyjviitx03q',
+  })
+  findOne(@Req() req: FastifyRequest) {
+    return req.store;
   }
 
   @Patch(':id')
+  @UseGuards(StoreOwnerGuard)
   @ApiOperation({ summary: 'Update store' })
   async update(@Param('id') id: string, @Body() body: UpdateStoreDto) {
     return await this.storeService.update(id, body);

@@ -9,9 +9,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { QueryCategoryDto } from './dto/query-category.dto';
+import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { QueryCategoryDto } from './dtos/query-category.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiPaginationQuery } from '@app/common/decorators/api-pagination-query.decorator';
 

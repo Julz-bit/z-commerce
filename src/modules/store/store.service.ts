@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateStoreDto } from './dto/create-store.dto';
-import { UpdateStoreDto } from './dto/update-store.dto';
+import { CreateStoreDto } from './dtos/create-store.dto';
+import { UpdateStoreDto } from './dtos/update-store.dto';
 import { DrizzleService } from '@app/common/drizzle/drizzle.service';
 import { store } from '@app/common/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
@@ -45,14 +45,13 @@ export class StoreService {
   }
 
   async update(id: string, dto: UpdateStoreDto): Promise<StoreModel> {
-    const data = await this.findOne(id);
     const result = await this.drizzle.client
       .update(store)
       .set({
         ...dto,
         updatedAt: new Date(),
       })
-      .where(eq(store.id, data.id))
+      .where(eq(store.id, id))
       .returning()
       .then((rows) => rows[0]);
     await this.cache.del(`${CacheKeys.STORE}:${id}`);

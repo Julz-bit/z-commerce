@@ -7,7 +7,6 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { StoreModule } from './modules/store/store.module';
 import { CachingModule } from './common/caching/caching.module';
-import { ProductModule } from './modules/product/product.module';
 import { CategoryModule } from './modules/category/category.module';
 
 @Module({
@@ -18,7 +17,6 @@ import { CategoryModule } from './modules/category/category.module';
     AuthModule,
     StoreModule,
     CachingModule,
-    ProductModule,
     CategoryModule,
   ],
   controllers: [AppController],

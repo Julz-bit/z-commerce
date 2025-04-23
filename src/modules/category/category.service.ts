@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { DrizzleService } from '@app/common/drizzle/drizzle.service';
 import { CachingService } from '@app/common/caching/caching.service';
 import { CategoryModel } from '@app/common/drizzle/models.type';
@@ -12,7 +12,7 @@ import { and, asc, desc, eq, gt, ilike, lt } from 'drizzle-orm';
 import { category } from '@app/common/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { PaginatedResult } from '@app/common/interfaces/paginated-result';
-import { QueryCategoryDto } from './dto/query-category.dto';
+import { QueryCategoryDto } from './dtos/query-category.dto';
 import { CacheKeys } from '@app/common/enums/cache-keys';
 import { toLowerAndRemoveSpace } from '@app/utils/format-str';
 import { paginationResult } from '@app/utils/pagination';
