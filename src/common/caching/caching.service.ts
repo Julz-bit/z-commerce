@@ -7,7 +7,7 @@ export class CachingService implements OnModuleDestroy {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject('REDIS_CLIENT') private redis: Redis,
-  ) { }
+  ) {}
 
   async get<T = any>(key: string): Promise<T | undefined> {
     const result = await this.cacheManager.get<T>(key);
