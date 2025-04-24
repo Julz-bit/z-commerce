@@ -59,8 +59,8 @@ describe('StoreService', () => {
   });
 
   it('should create a store', async () => {
-    const dto = { name: 'Test Store', description: 'Test' };
-    const result = await service.create(dto as CreateStoreDto, 'user-123');
+    const dto: CreateStoreDto = { name: 'Test Store', description: 'Test' };
+    const result = await service.create(dto, 'user-123');
     expect(result).toEqual(mockStore);
   });
 
@@ -93,8 +93,8 @@ describe('StoreService', () => {
   it('should update a store and delete cache', async () => {
     drizzleMock.client.returning.mockResolvedValue([mockStore]);
 
-    const dto = { name: 'Updated Name' };
-    const result = await service.update('mock-store-id', dto as UpdateStoreDto);
+    const dto: UpdateStoreDto = { name: 'Updated Name' };
+    const result = await service.update('mock-store-id', dto);
 
     expect(result).toEqual(mockStore);
     expect(cacheMock.del).toHaveBeenCalledWith('store:mock-store-id');

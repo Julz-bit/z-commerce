@@ -7,7 +7,7 @@ export class CachingService implements OnModuleDestroy {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject('REDIS_CLIENT') private redis: Redis,
-  ) {}
+  ) { }
 
   async get<T = any>(key: string): Promise<T | undefined> {
     const result = await this.cacheManager.get<T>(key);
@@ -31,10 +31,14 @@ export class CachingService implements OnModuleDestroy {
           'MATCH',
           `${pattern}*`,
           'COUNT',
-          100,
+          300,
         );
         if (keys.length > 0) {
-          await this.redis.del(...keys);
+          const pipeline = this.redis.pipeline();
+          for (const key of keys) {
+            pipeline.del(key);
+          }
+          await pipeline.exec();
         }
         cursor = nextCursor;
       } while (cursor !== '0');

@@ -40,7 +40,7 @@ model store {
   cursor        Int            @default(autoincrement())
   ownerId       String
   name          String
-  description   String?
+  description   String?    @db.Text
   rating        Decimal?   @db.Decimal(3, 2)
   isVerified    Boolean?   @default(false)
   contactNumber String?
@@ -76,15 +76,11 @@ model category {
 
 model product {
   id               String            @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor           Int               @default(autoincrement())
   storeId          String
   name             String
-  description      String?
-  price            Decimal           @db.Decimal(10, 2)
-  stock            Int               @default(0)
+  description      String?           @db.Text
   categories       Json?
-  attributes       Json?
-  files            Json?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime?         @updatedAt
   cartItems        cartItem[]
@@ -93,12 +89,31 @@ model product {
   store            store             @relation(fields: [storeId], references: [id])
   productDiscounts productDiscount[]
   reviews          review[]
+  variants         productVariant[]
 
   @@index([cursor])
   @@index([storeId])
-  @@index([name])
-  @@index([price])
+  @@index([name(ops: raw("gin_trgm_ops"))], map: "product_name_trgm_idx", type: Gin)
   @@index([categories], map: "product_categories_gin_idx", type: Gin)
+}
+
+model productVariant {
+  id          String   @id @default(cuid())
+  cursor      Int      @default(autoincrement())
+  productId   String
+  sku         String   @unique
+  quantity    Int      @default(0)
+  price       Decimal  @db.Decimal(10, 2)
+  attributes  Json?    
+  files       Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product     product  @relation(fields: [productId], references: [id])
+  cartItem    cartItem[]
+  orederItem  orderItem[]
+  
+  @@index([productId])
 }
 
 model cartItem {
@@ -106,19 +121,23 @@ model cartItem {
   cursor        Int            @default(autoincrement())
   userId    String
   productId String
+  productVariantId String
   storeId   String
   quantity  Int      @default(1)
   price     Decimal  @db.Decimal(10, 2)
   status    CartItemStatus   @default(active)
   addedAt   DateTime @default(now())
+
   product   product  @relation(fields: [productId], references: [id])
   store     store    @relation(fields: [storeId], references: [id])
   user      user     @relation(fields: [userId], references: [id])
+  variant   productVariant @relation(fields: [productVariantId], references: [id])
 
   @@index([cursor])
   @@index([userId])
   @@index([storeId])
   @@index([productId])
+  @@index([productVariantId])
   @@index([status])
 }
 
@@ -147,17 +166,20 @@ model order {
 
 model orderItem {
   id        String  @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor    Int            @default(autoincrement())
   orderId   String
   productId String
+  productVariantId String
   quantity  Int
   price     Decimal @db.Decimal(10, 2)
   order     order   @relation(fields: [orderId], references: [id])
   product   product @relation(fields: [productId], references: [id])
+  variant   productVariant @relation(fields: [productVariantId], references: [id])
 
   @@index([cursor])
   @@index([orderId])
   @@index([productId])
+  @@index([productVariantId])
 }
 
 model review {
