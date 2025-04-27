@@ -125,6 +125,7 @@ export const product = pgTable(
     name: text('name').notNull(),
     description: text('description'),
     categories: jsonb('categories'),
+    categoriesFlat: text('categoriesFlat').notNull(),
     createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
     updatedAt: timestamp('updatedAt', { precision: 3 }),
   },

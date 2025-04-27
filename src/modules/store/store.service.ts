@@ -28,14 +28,14 @@ export class StoreService {
       .then((rows) => rows[0]);
   }
 
-  async findOne(id: string): Promise<StoreModel> {
-    const cacheKey = `${CacheKeys.STORE}:${id}`;
+  async findOne(storeId: string): Promise<StoreModel> {
+    const cacheKey = `${CacheKeys.STORE}:${storeId}`;
     const cachedResult = await this.cache.get<StoreModel>(cacheKey);
     if (cachedResult) {
       return cachedResult;
     }
     const result = await this.drizzle.client.query.store.findFirst({
-      where: eq(store.id, id),
+      where: eq(store.id, storeId),
     });
     if (!result) {
       throw new NotFoundException('store not found!');
@@ -44,17 +44,17 @@ export class StoreService {
     return result;
   }
 
-  async update(id: string, dto: UpdateStoreDto): Promise<StoreModel> {
+  async update(storeId: string, dto: UpdateStoreDto): Promise<StoreModel> {
     const result = await this.drizzle.client
       .update(store)
       .set({
         ...dto,
         updatedAt: new Date(),
       })
-      .where(eq(store.id, id))
+      .where(eq(store.id, storeId))
       .returning()
       .then((rows) => rows[0]);
-    await this.cache.del(`${CacheKeys.STORE}:${id}`);
+    await this.cache.del(`${CacheKeys.STORE}:${storeId}`);
     return result;
   }
 }

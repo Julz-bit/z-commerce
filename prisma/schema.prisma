@@ -81,6 +81,7 @@ model product {
   name             String
   description      String?           @db.Text
   categories       Json?
+  categoriesFlat   String            @db.Text
   createdAt        DateTime          @default(now())
   updatedAt        DateTime?         @updatedAt
   cartItems        cartItem[]
@@ -94,6 +95,7 @@ model product {
   @@index([cursor])
   @@index([storeId])
   @@index([name(ops: raw("gin_trgm_ops"))], map: "product_name_trgm_idx", type: Gin)
+  @@index([categoriesFlat(ops: raw("gin_trgm_ops"))], map: "product_categories_flat_trgm_idx", type: Gin)
   @@index([categories], map: "product_categories_gin_idx", type: Gin)
 }
 

@@ -2,7 +2,7 @@ import { SortOrder } from '@app/common/enums/sort-order.enum';
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsPositive, MinLength } from 'class-validator';
 
-export class QueryCategoryDto {
+export class CursorBasedPaginationDto {
   @IsEnum(SortOrder, { message: 'Order must be either asc or desc' })
   order: SortOrder;
 

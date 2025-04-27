@@ -12,7 +12,7 @@ import { and, asc, desc, eq, gt, ilike, lt } from 'drizzle-orm';
 import { category } from '@app/common/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { PaginatedResult } from '@app/common/interfaces/paginated-result';
-import { QueryCategoryDto } from './dtos/query-category.dto';
+import { PaginationCategoryDto } from './dtos/pagination-category.dto';
 import { CacheKeys } from '@app/common/enums/cache-keys';
 import { toLowerAndRemoveSpace } from '@app/utils/format-str';
 import { paginationResult } from '@app/utils/pagination';
@@ -46,7 +46,7 @@ export class CategoryService {
   }
 
   async findAll(
-    query: QueryCategoryDto,
+    query: PaginationCategoryDto,
   ): Promise<PaginatedResult<CategoryModel>> {
     const { order = SortOrder.ASC, limit, cursor, search } = query;
     const cacheKey = `${CacheKeys.CATEGORY}:${order}:${limit}:${cursor ?? 'cursor'}:${toLowerAndRemoveSpace(search)}`;
@@ -79,6 +79,10 @@ export class CategoryService {
 
   async findOne(id: string): Promise<CategoryModel> {
     const cacheKey = `${CacheKeys.CATEGORY}:${id}`;
+    const cachedResult = await this.cache.get<CategoryModel>(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
     const result = await this.drizzle.client.query.category.findFirst({
       where: eq(category.id, id),
     });

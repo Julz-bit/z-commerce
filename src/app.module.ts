@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { StoreModule } from './modules/store/store.module';
 import { CachingModule } from './common/caching/caching.module';
 import { CategoryModule } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CategoryModule } from './modules/category/category.module';
     StoreModule,
     CachingModule,
     CategoryModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],

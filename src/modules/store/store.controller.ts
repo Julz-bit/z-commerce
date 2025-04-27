@@ -36,11 +36,11 @@ export class StoreController {
     return await this.storeService.create(body, auth.id);
   }
 
-  @Get(':id')
+  @Get(':storeId')
   @UseGuards(StoreOwnerGuard)
   @ApiOperation({ summary: 'Get store via id' })
   @ApiParam({
-    name: 'id',
+    name: 'storeId',
     type: String,
     description: 'store id',
     example: 'wbqfo03a0qx8qmyjviitx03q',
@@ -49,10 +49,13 @@ export class StoreController {
     return req.store;
   }
 
-  @Patch(':id')
+  @Patch(':storeId')
   @UseGuards(StoreOwnerGuard)
   @ApiOperation({ summary: 'Update store' })
-  async update(@Param('id') id: string, @Body() body: UpdateStoreDto) {
-    return await this.storeService.update(id, body);
+  async update(
+    @Param('storeId') storeId: string,
+    @Body() body: UpdateStoreDto,
+  ) {
+    return await this.storeService.update(storeId, body);
   }
 }
