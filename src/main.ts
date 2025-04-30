@@ -8,12 +8,14 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { formatErrors } from '@app/utils/format-error';
+import * as multiPart from '@fastify/multipart';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
   );
+
   const config = app.get(ConfigService);
 
   app.useGlobalPipes(
@@ -46,7 +48,13 @@ async function bootstrap() {
     });
   }
 
-  await app.listen(config.get<number>('APP_PORT') ?? 3000);
+  // @ts-expect-error: @fastify/multipart is a valid Fastify v5 plugin, but its ESM types are not inferred properly by Nest's .register() typings.
+  await app.register(multiPart);
+
+  await app.listen(
+    config.get<number>('APP_PORT') ?? 3000,
+    config.get('APP_HOST'),
+  );
 }
 
 void bootstrap();

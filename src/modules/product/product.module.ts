@@ -5,9 +5,10 @@ import { DrizzleModule } from '@app/common/drizzle/drizzle.module';
 import { AuthModule } from '../auth/auth.module';
 import { CachingModule } from '@app/common/caching/caching.module';
 import { StoreModule } from '../store/store.module';
+import { FileModule } from '@app/common/file/file.module';
 
 @Module({
-  imports: [DrizzleModule, AuthModule, CachingModule, StoreModule],
+  imports: [DrizzleModule, AuthModule, CachingModule, StoreModule, FileModule],
   controllers: [ProductController],
   providers: [ProductService],
   exports: [ProductService],

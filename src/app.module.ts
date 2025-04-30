@@ -9,6 +9,7 @@ import { StoreModule } from './modules/store/store.module';
 import { CachingModule } from './common/caching/caching.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
+import { FileModule } from './common/file/file.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProductModule } from './modules/product/product.module';
     CachingModule,
     CategoryModule,
     ProductModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

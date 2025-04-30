@@ -149,7 +149,7 @@ export const productVariant = pgTable(
       .default(sql`cuid(1)`),
     cursor: serial('cursor').notNull(),
     productId: text('productId').notNull(),
-    sku: text('sku').notNull().unique(),
+    sku: text('sku').notNull(),
     quantity: integer('quantity').notNull(),
     price: decimal('price', { precision: 65, scale: 30 }).notNull(),
     attributes: jsonb('attributes'),
