@@ -13,23 +13,24 @@ datasource db {
 }
 
 model user {
-  id            String         @id @default(cuid())
-  cursor        Int            @default(autoincrement())
-  email         String         @unique
+  id            String          @id @default(cuid())
+  cursor        Int             @default(autoincrement())
+  email         String          @unique
   password      String
   name          String
   phone         String
   addresses     Json?
   lastAccess    DateTime?
-  isVerified    Boolean?       @default(false)
+  isVerified    Boolean?        @default(false)
   avatar        String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime?      @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?       @updatedAt
   cartItems     cartItem[]
   orders        order[]
   reviews       review[]
   stores        store[]
   voucherUsages voucherUsage[]
+  searchHistory searchHistory[]
 
   @@index([cursor])
   @@index([email])
@@ -37,7 +38,7 @@ model user {
 
 model store {
   id            String     @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor        Int        @default(autoincrement())
   ownerId       String
   name          String
   description   String?    @db.Text
@@ -57,12 +58,11 @@ model store {
   @@index([cursor])
   @@index([ownerId])
   @@index([name])
-  
 }
 
 model category {
   id        String     @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor    Int        @default(autoincrement())
   name      String     @unique
   parentId  String?
   createdAt DateTime   @default(now())
@@ -99,40 +99,40 @@ model product {
 }
 
 model productVariant {
-  id          String   @id @default(cuid())
-  cursor      Int      @default(autoincrement())
-  productId   String
-  sku         String   
-  quantity    Int      @default(0)
-  price       Decimal  @db.Decimal(10, 2)
-  attributes  Json?    
-  files       Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  cursor     Int      @default(autoincrement())
+  productId  String
+  sku        String
+  quantity   Int      @default(0)
+  price      Decimal  @db.Decimal(10, 2)
+  attributes Json?
+  files      Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  product     product  @relation(fields: [productId], references: [id])
-  cartItem    cartItem[]
-  orederItem  orderItem[]
-  
+  product    product     @relation(fields: [productId], references: [id])
+  cartItem   cartItem[]
+  orederItem orderItem[]
+
   @@index([productId])
 }
 
 model cartItem {
-  id        String   @id @default(cuid())
-  cursor        Int            @default(autoincrement())
-  userId    String
-  productId String
+  id               String         @id @default(cuid())
+  cursor           Int            @default(autoincrement())
+  userId           String
+  productId        String
   productVariantId String
-  storeId   String
-  quantity  Int      @default(1)
-  price     Decimal  @db.Decimal(10, 2)
-  status    CartItemStatus   @default(active)
-  addedAt   DateTime @default(now())
+  storeId          String
+  quantity         Int            @default(1)
+  price            Decimal        @db.Decimal(10, 2)
+  status           CartItemStatus @default(active)
+  addedAt          DateTime       @default(now())
 
-  product   product  @relation(fields: [productId], references: [id])
-  store     store    @relation(fields: [storeId], references: [id])
-  user      user     @relation(fields: [userId], references: [id])
-  variant   productVariant @relation(fields: [productVariantId], references: [id])
+  product product        @relation(fields: [productId], references: [id])
+  store   store          @relation(fields: [storeId], references: [id])
+  user    user           @relation(fields: [userId], references: [id])
+  variant productVariant @relation(fields: [productVariantId], references: [id])
 
   @@index([cursor])
   @@index([userId])
@@ -166,16 +166,16 @@ model order {
 }
 
 model orderItem {
-  id        String  @id @default(cuid())
-  cursor    Int            @default(autoincrement())
-  orderId   String
-  productId String
+  id               String         @id @default(cuid())
+  cursor           Int            @default(autoincrement())
+  orderId          String
+  productId        String
   productVariantId String
-  quantity  Int
-  price     Decimal @db.Decimal(10, 2)
-  order     order   @relation(fields: [orderId], references: [id])
-  product   product @relation(fields: [productId], references: [id])
-  variant   productVariant @relation(fields: [productVariantId], references: [id])
+  quantity         Int
+  price            Decimal        @db.Decimal(10, 2)
+  order            order          @relation(fields: [orderId], references: [id])
+  product          product        @relation(fields: [productId], references: [id])
+  variant          productVariant @relation(fields: [productVariantId], references: [id])
 
   @@index([cursor])
   @@index([orderId])
@@ -185,7 +185,7 @@ model orderItem {
 
 model review {
   id        String    @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor    Int       @default(autoincrement())
   userId    String
   productId String
   rating    Int
@@ -202,7 +202,7 @@ model review {
 
 model discount {
   id               String            @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor           Int               @default(autoincrement())
   storeId          String
   name             String?
   type             String
@@ -223,21 +223,21 @@ model discount {
 
 model productDiscount {
   id         String   @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor     Int      @default(autoincrement())
   productId  String
   discountId String
   discount   discount @relation(fields: [discountId], references: [id])
   product    product  @relation(fields: [productId], references: [id])
 
-  @@index([cursor])
   @@unique([productId, discountId])
+  @@index([cursor])
   @@index([productId])
   @@index([discountId])
 }
 
 model flashSale {
   id         String   @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor     Int      @default(autoincrement())
   productId  String
   flashPrice Decimal  @db.Decimal(10, 2)
   stockLimit Int?
@@ -254,7 +254,7 @@ model flashSale {
 
 model voucher {
   id               String         @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor           Int            @default(autoincrement())
   code             String         @unique
   storeId          String?
   type             String
@@ -278,7 +278,7 @@ model voucher {
 
 model voucherUsage {
   id        String   @id @default(cuid())
-  cursor        Int            @default(autoincrement())
+  cursor    Int      @default(autoincrement())
   voucherId String
   userId    String
   orderId   String
@@ -287,13 +287,24 @@ model voucherUsage {
   user      user     @relation(fields: [userId], references: [id])
   voucher   voucher  @relation(fields: [voucherId], references: [id])
 
-  @@index([cursor])
   @@unique([voucherId, userId, orderId])
+  @@index([cursor])
   @@index([voucherId])
   @@index([userId])
   @@index([orderId])
 }
 
+model searchHistory {
+  id        String   @id @default(cuid())
+  cursor    Int      @default(autoincrement())
+  userId    String
+  keyword   String
+  createdAt DateTime @default(now())
+
+  user user @relation(fields: [userId], references: [id])
+
+  @@index([userId, keyword])
+}
 
 enum CartItemStatus {
   active
@@ -302,25 +313,25 @@ enum CartItemStatus {
 }
 
 enum OrderStatus {
-  pending         // order placed but not paid yet
-  for_payment     // waiting for payment
-  paid            // payment received
-  processing      // order being prepared/packed
-  on_transit      // shipped, in delivery
-  delivered       // delivered to customer
-  received        // customer confirmed receipt
-  completed       // fully completed (optional)
-  cancelled       // cancelled by customer/admin
-  failed          // payment or delivery failed
-  returned        // returned by customer
-  refunded        // refund processed
+  pending // order placed but not paid yet
+  for_payment // waiting for payment
+  paid // payment received
+  processing // order being prepared/packed
+  on_transit // shipped, in delivery
+  delivered // delivered to customer
+  received // customer confirmed receipt
+  completed // fully completed (optional)
+  cancelled // cancelled by customer/admin
+  failed // payment or delivery failed
+  returned // returned by customer
+  refunded // refund processed
 }
 
 enum PaymentType {
-  cod         // Cash on Delivery
-  gcash       // GCash or similar e-wallet
-  card        // Credit or Debit card
-  bank        // Bank transfer
-  paypal      // PayPal
-  other       // fallback or custom payments
+  cod // Cash on Delivery
+  gcash // GCash or similar e-wallet
+  card // Credit or Debit card
+  bank // Bank transfer
+  paypal // PayPal
+  other // fallback or custom payments
 }

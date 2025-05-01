@@ -10,6 +10,7 @@ import { CachingModule } from './common/caching/caching.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
 import { FileModule } from './common/file/file.module';
+import { SearchHistoryModule } from './modules/search-history/search-history.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FileModule } from './common/file/file.module';
     CategoryModule,
     ProductModule,
     FileModule,
+    SearchHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

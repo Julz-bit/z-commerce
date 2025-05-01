@@ -78,10 +78,6 @@ export class ProductService {
     return result;
   }
 
-  findAll() {
-    return `This action returns all product`;
-  }
-
   async findOne(id: string) {
     const cacheKey = `${CacheKeys.PRODUCT}:${id}`;
     const cachedResult = await this.cache.get<ProductModel>(cacheKey);
@@ -114,8 +110,8 @@ export class ProductService {
       files: [] as string[],
     }));
     const key = `media/${storeId}`;
-    const fileKeys = await this.file.uploadFiles(key, files);
-    for (const uploaded of fileKeys) {
+    const uploadFiles = await this.file.uploadFiles(key, files);
+    for (const uploaded of uploadFiles) {
       const index = extractIndexes(uploaded.fieldname);
       if (index[0] !== null && variants[index[0]]) {
         variants[index[0]].files.push(uploaded.key);

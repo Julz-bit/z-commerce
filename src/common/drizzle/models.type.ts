@@ -16,3 +16,4 @@ export type ProductDiscountModel = InferSelectModel<
 export type FlashSaleModel = InferSelectModel<typeof schema.flashSale>;
 export type VoucherModel = InferSelectModel<typeof schema.voucher>;
 export type VoucherUsageModel = InferSelectModel<typeof schema.voucherUsage>;
+export type SearchHistoryModel = InferSelectModel<typeof schema.searchHistory>;

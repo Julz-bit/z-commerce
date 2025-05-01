@@ -484,6 +484,29 @@ export const voucherUsage = pgTable(
   }),
 );
 
+export const searchHistory = pgTable(
+  'searchHistory',
+  {
+    id: text('id')
+      .notNull()
+      .primaryKey()
+      .default(sql`cuid(1)`),
+    cursor: serial('cursor').notNull(),
+    userId: text('userId').notNull(),
+    keyword: text('keyword').notNull(),
+    createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
+  },
+  (searchHistory) => ({
+    searchHistory_user_fkey: foreignKey({
+      name: 'searchHistory_user_fkey',
+      columns: [searchHistory.userId],
+      foreignColumns: [user.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+  }),
+);
+
 export const userRelations = relations(user, ({ many }) => ({
   cartItems: many(cartItem, {
     relationName: 'cartItemTouser',
@@ -499,6 +522,9 @@ export const userRelations = relations(user, ({ many }) => ({
   }),
   voucherUsages: many(voucherUsage, {
     relationName: 'userTovoucherUsage',
+  }),
+  searchHistory: many(searchHistory, {
+    relationName: 'searchHistoryTouser',
   }),
 }));
 
@@ -713,5 +739,13 @@ export const voucherUsageRelations = relations(voucherUsage, ({ one }) => ({
     relationName: 'voucherTovoucherUsage',
     fields: [voucherUsage.voucherId],
     references: [voucher.id],
+  }),
+}));
+
+export const searchHistoryRelations = relations(searchHistory, ({ one }) => ({
+  user: one(user, {
+    relationName: 'searchHistoryTouser',
+    fields: [searchHistory.userId],
+    references: [user.id],
   }),
 }));
