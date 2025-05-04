@@ -129,11 +129,11 @@ export class ProductService {
           order === SortOrder.ASC ? asc(product.cursor) : desc(product.cursor),
       });
     } else {
-      // If search query is not passed check search history to get related
       const searches = await this.searchHistoryService.findLatest(userId);
       const keywords = searches.map((s) => s.keyword);
 
       if (keywords.length <= 0) {
+        // If no search history just return products
         data = await this.drizzle.client.query.product.findMany({
           where: cursor
             ? order === SortOrder.ASC
@@ -148,7 +148,7 @@ export class ProductService {
               : desc(product.cursor),
         });
       } else {
-        // If no search history just return products
+        // If search query is not passed check search history to get related
         data = await this.drizzle.client.query.product.findMany({
           where: and(
             cursor
