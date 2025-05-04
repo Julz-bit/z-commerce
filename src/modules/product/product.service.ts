@@ -110,7 +110,6 @@ export class ProductService {
     let data: ProductModel[];
     // If user passed a search query
     if (search) {
-      console.log('called', 'with search');
       await this.searchHistoryService.create(userId, search);
       data = await this.drizzle.client.query.product.findMany({
         where: and(
@@ -135,7 +134,6 @@ export class ProductService {
       const keywords = searches.map((s) => s.keyword);
 
       if (keywords.length <= 0) {
-        console.log('called', 'without search history');
         data = await this.drizzle.client.query.product.findMany({
           where: cursor
             ? order === SortOrder.ASC
@@ -151,8 +149,6 @@ export class ProductService {
         });
       } else {
         // If no search history just return products
-        console.log('called', 'both without search history');
-
         data = await this.drizzle.client.query.product.findMany({
           where: and(
             cursor
