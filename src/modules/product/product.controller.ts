@@ -26,6 +26,8 @@ import { validate } from 'class-validator';
 import { formatErrors } from '@app/utils/format-error';
 import { VariantDto } from './dto/variant.dto';
 import { ApiVariantBody } from '@app/common/decorators/api-variant-body.decorator';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { AuthUser } from '@app/common/interfaces/auth-user.interface';
 
 @ApiTags('Product Service')
 @ApiBearerAuth()
@@ -78,6 +80,15 @@ export class ProductController {
     @Query() query: PaginationProductDto,
   ) {
     return await this.productService.findByStore(storeId, query);
+  }
+
+  @Get('related')
+  @ApiPaginationQuery()
+  async findRelated(
+    @Auth() user: AuthUser,
+    @Query() query: PaginationProductDto,
+  ) {
+    return await this.productService.findRelated(user.id, query);
   }
 
   @Get(':id')

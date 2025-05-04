@@ -1,3 +1,4 @@
+import { shuffle } from 'lodash';
 import { SortOrder } from '@app/common/enums/sort-order.enum';
 import { PaginatedResult } from '@app/common/interfaces/paginated-result';
 
@@ -10,6 +11,7 @@ export function paginationResult<T extends CursorItem>(
   limit: number,
   order: SortOrder,
   cursor?: number,
+  opts?: { shuffle?: boolean },
 ): PaginatedResult<T> {
   const hasNextPage = data.length > limit;
   const items = hasNextPage ? data.slice(0, -1) : data;
@@ -22,7 +24,7 @@ export function paginationResult<T extends CursorItem>(
     formattedData.length > 0 ? (formattedData[0]?.cursor ?? null) : null;
 
   return {
-    data: formattedData,
+    data: opts?.shuffle ? shuffle(formattedData) : formattedData,
     meta: {
       hasNextPage,
       hasPreviousPage: Boolean(cursor),

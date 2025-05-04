@@ -13,7 +13,7 @@ export class SearchHistoryController {
   constructor(private readonly searchHistoryService: SearchHistoryService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get 10 latest search result' })
+  @ApiOperation({ summary: 'Get 5 latest search result' })
   async findAll(@Auth() auth: AuthUser) {
     return await this.searchHistoryService.findLatest(auth.id);
   }
